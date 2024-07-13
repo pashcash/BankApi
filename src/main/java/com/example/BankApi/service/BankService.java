@@ -1,8 +1,12 @@
 package com.example.BankApi.service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.hibernate.mapping.Array;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -22,13 +26,10 @@ public class BankService {
         Optional<Bank> bankData = bankRepository.findById(bankId);
         if (bankData.isPresent()) {
 			Bank bank = bankData.get();
-            if (bank.getId().equals(bankId))
-            {
-                bank.setName(bankDetails.getName());
-                bank.setBic(bankDetails.getBic());
-                bankRepository.save(bank);
-                return new ResponseEntity<>(bank, HttpStatus.OK);
-            }
+            bank.setName(bankDetails.getName());
+            bank.setBic(bankDetails.getBic());
+            bankRepository.save(bank);
+            return new ResponseEntity<>(bank, HttpStatus.OK);
 		}
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
@@ -48,8 +49,17 @@ public class BankService {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    public List<Bank> getAllBanks()
+    public ResponseEntity<List<Bank>> getAllBanks(String sortColumn)
     {
-        return bankRepository.findAll();
+        if (sortColumn == null)
+        {
+            return new ResponseEntity<>(bankRepository.findAll(), HttpStatus.OK);
+        }
+        List<String> columns = Arrays.asList("id", "name", "bic"); 
+        if (columns.contains(sortColumn))
+        {
+            return new ResponseEntity<>(bankRepository.findAll(Sort.by(sortColumn)), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 }

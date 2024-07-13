@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.BankApi.service.BankService;
@@ -46,8 +47,8 @@ public class BankController {
     }
 
     @GetMapping()
-    public List<Bank> getBanks()
+    public ResponseEntity<List<Bank>> getBanks(@RequestParam(required = false, name="sort-by") String sortColumn)
     {
-        return bankService.getAllBanks();
+        return bankService.getAllBanks(sortColumn);
     }
 }
