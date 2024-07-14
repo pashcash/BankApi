@@ -8,20 +8,20 @@ CREATE TABLE bank (
 CREATE TABLE client (
     id BIGINT NOT NULL AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
-    shortName VARCHAR(255) NOT NULL,
+    short_name VARCHAR(255) NOT NULL,
     address VARCHAR(255) NOT NULL,
-    legalForm ENUM ('OOO', 'ZAO', 'IP') NOT NULL,
+    legal_form ENUM ('OOO', 'ZAO', 'IP') NOT NULL,
     PRIMARY KEY(id)
 );
 
 CREATE TABLE deposit (
     id BIGINT NOT NULL AUTO_INCREMENT,
-    clientId BIGINT NOT NULL,
-    bankId BIGINT NOT NULL,
-    openDate DATE NOT NULL,
+    client_id BIGINT NOT NULL,
+    bank_id BIGINT NOT NULL,
+    open_date DATE NOT NULL,
     percentage DOUBLE NOT NULL,
     term INT NOT NULL,
     PRIMARY KEY(id),
-    FOREIGN KEY(clientId) REFERENCES client(id),
-    FOREIGN KEY(bankId) REFERENCES bank(id)
+    FOREIGN KEY(client_id) REFERENCES client(id),
+    FOREIGN KEY(bank_id) REFERENCES bank(id)
 );

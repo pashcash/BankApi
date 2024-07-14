@@ -1,8 +1,7 @@
-package com.example.BankApi.controller;
+package com.example.BankApi.controllers;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,19 +13,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.BankApi.service.BankService;
-import com.example.BankApi.model.Bank;
-import com.example.BankApi.repos.BankRepository;
+import com.example.BankApi.models.Bank;
+import com.example.BankApi.services.BankService;
+
+import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/banks")
+@AllArgsConstructor
 public class BankController {
-    BankService bankService;
-
-    public BankController(BankService bankService)
-    {
-        this.bankService = bankService;
-    }
+    private BankService bankService;
 
     @PutMapping("/{id}")
     public ResponseEntity<Bank> updateBankById(@PathVariable Long id, @RequestBody Bank bankDetails)
@@ -47,7 +43,7 @@ public class BankController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<Bank>> getBanks(@RequestParam(required = false, name="sort-by") String sortColumn)
+    public ResponseEntity<List<Bank>> getBanks(@RequestParam(required = false) String sortColumn)
     {
         return bankService.getAllBanks(sortColumn);
     }
