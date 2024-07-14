@@ -9,8 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.example.BankApi.enums.LegalForm;
-import com.example.BankApi.exceptions.types.BadLegalFormException;
 import com.example.BankApi.exceptions.types.BadRequestException;
 import com.example.BankApi.exceptions.types.EntityNotFoundException;
 import com.example.BankApi.models.Client;
@@ -24,12 +22,11 @@ public class ClientService {
      
     private ClientRepository clientRepository;
 
-    public ResponseEntity<Client> updateClient(Long clientId, Client clientDetails) {
+    public ResponseEntity<Client> updateClient(Long clientId, Client clientDetails) 
+    {
         Optional<Client> clientData = clientRepository.findById(clientId);
         if (!clientData.isPresent())
 			throw new EntityNotFoundException("Client with id = " + clientId + " doesn`t exist");
-        if (!(clientDetails.getLegalForm() instanceof LegalForm))
-            throw new BadLegalFormException("Legal form is incorrect");
         Client client = clientData.get();
         client.setName(clientDetails.getName());
         client.setShortName(clientDetails.getShortName());
@@ -39,10 +36,8 @@ public class ClientService {
         return new ResponseEntity<>(client, HttpStatus.OK);    
     }
 
-    public Client createClient(Client clientDetails)
+    public Client addClient(Client clientDetails)
     {
-        if (!(clientDetails.getLegalForm() instanceof LegalForm))
-            throw new BadLegalFormException("Legal form is incorrect");
         return clientRepository.save(clientDetails);
     }
 

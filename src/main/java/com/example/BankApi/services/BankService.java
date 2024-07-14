@@ -33,7 +33,7 @@ public class BankService {
         return new ResponseEntity<>(bank, HttpStatus.OK);
     }
 
-    public Bank createBank(Bank bank)
+    public Bank addBank(Bank bank)
     {
         return bankRepository.save(bank);
     }

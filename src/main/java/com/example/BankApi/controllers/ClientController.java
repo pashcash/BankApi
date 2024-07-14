@@ -22,6 +22,7 @@ import lombok.AllArgsConstructor;
 @RequestMapping("/clients")
 @AllArgsConstructor
 public class ClientController {
+    
     private ClientService clientService;
 
     @PutMapping("/{id}")
@@ -31,9 +32,9 @@ public class ClientController {
     }
 
     @PostMapping
-    public Client createNewClient(@RequestBody Client clientDetails)
+    public Client addNewClient(@RequestBody Client clientDetails)
     {
-        return clientService.createClient(clientDetails);
+        return clientService.addClient(clientDetails);
     }
 
     @DeleteMapping("/{id}")

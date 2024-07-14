@@ -1,43 +1,42 @@
 package com.example.BankApi.models;
 
-import com.example.BankApi.enums.LegalForm;
+import java.util.Date;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "client")
+@Table(name = "deposit")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Client {
+public class Deposit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name="id")
     private Long id;
 
-    @Column(name = "name")
-    private String name;
+    @Column(name = "client_id")
+    private Long clientId;
     
-    @Column(name = "short_name")
-    private String shortName;
+    @Column(name = "bank_id")
+    private Long bankId;
     
-    @Column(name = "address")
-    private String address;
+    @Column(name = "open_date")
+    private Date openDate;
     
-    @Column(name = "legal_form")
-    @Enumerated(EnumType.STRING)
-    private LegalForm legalForm;
+    @Column(name = "percentage")
+    private Double percentage;
+    
+    @Column(name = "term")
+    private Integer term;
 }

@@ -13,39 +13,39 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.BankApi.models.Bank;
-import com.example.BankApi.services.BankService;
+import com.example.BankApi.models.Deposit;
+import com.example.BankApi.services.DepositService;
 
 import lombok.AllArgsConstructor;
 
 @RestController
-@RequestMapping("/banks")
+@RequestMapping("/deposits")
 @AllArgsConstructor
-public class BankController {
+public class DepositController {
     
-    private BankService bankService;
+    private DepositService depositService;
 
     @PutMapping("/{id}")
-    public ResponseEntity<Bank> updateBankById(@PathVariable Long id, @RequestBody Bank bankDetails)
+    public ResponseEntity<Deposit> updateDepositById(@PathVariable Long id, @RequestBody Deposit depositDetails)
     {
-        return bankService.updateBank(id, bankDetails);
+        return depositService.updateDeposit(id, depositDetails);
     }
 
     @PostMapping
-    public Bank addNewBank(@RequestBody Bank bankDetails)
+    public Deposit createNewDeposit(@RequestBody Deposit depositDetails)
     {
-        return bankService.addBank(bankDetails);
+        return depositService.addDeposit(depositDetails);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Bank> deleteBankById(@PathVariable Long id)
+    public ResponseEntity<Deposit> deleteDepositById(@PathVariable Long id)
     {
-        return bankService.deleteBank(id);
+        return depositService.deleteDeposit(id);
     }
 
     @GetMapping()
-    public ResponseEntity<List<Bank>> getBanks(@RequestParam(required = false, name="sort-by") String sortColumn)
+    public ResponseEntity<List<Deposit>> getDeposits(@RequestParam(required = false, name = "sort-by") String sortColumn)
     {
-        return bankService.getAllBanks(sortColumn);
+        return depositService.getAllDeposits(sortColumn);
     }
 }
