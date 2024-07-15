@@ -22,7 +22,7 @@ import lombok.AllArgsConstructor;
 @RequestMapping("/banks")
 @AllArgsConstructor
 public class BankController {
-    
+
     private BankService bankService;
 
     @PutMapping("/{id}")

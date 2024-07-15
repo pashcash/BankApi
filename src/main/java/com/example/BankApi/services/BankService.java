@@ -55,4 +55,12 @@ public class BankService {
             throw new BadRequestException("Sorting params incorrect");
         return new ResponseEntity<>(bankRepository.findAll(Sort.by(sortColumn)), HttpStatus.OK);
     }
+
+    public Bank getBankById(Long bankId)
+    {
+        Optional<Bank> bankData = bankRepository.findById(bankId);
+        if (!bankData.isPresent())
+            throw new EntityNotFoundException("Bank with id = " + bankId + " doesn`t exist");
+        return bankData.get();
+    }
 }
