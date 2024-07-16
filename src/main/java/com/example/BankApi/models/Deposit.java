@@ -1,6 +1,6 @@
 package com.example.BankApi.models;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -36,7 +36,7 @@ public class Deposit {
     private Long bankId;
     
     @Column(name = "open_date")
-    private Date openDate;
+    private LocalDate openDate;
     
     @Column(name = "percentage")
     private Double percentage;

@@ -59,4 +59,11 @@ public class ClientService {
             throw new BadRequestException("Sorting param is incorrect");
         return new ResponseEntity<>(clientRepository.findAll(Sort.by(sortColumn)), HttpStatus.OK);
     }
+
+    public Client getClientById(Long clientId) {
+        Optional<Client> clientData = clientRepository.findById(clientId);
+        if (!clientData.isPresent())
+            throw new EntityNotFoundException("Client with id = " + clientId + " doesn`t exist");
+        return clientData.get();
+    }
 }

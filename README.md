@@ -11,5 +11,6 @@
     - На Windows: `./mvnw spring-boot:run`
     - На Linux: `mvn spring-boot:run`
 3. Для редактирования базы данных
+    - Запустить проект
     - Зайти в браузер
     - Перейти по адресу `localhost:8080/h2`

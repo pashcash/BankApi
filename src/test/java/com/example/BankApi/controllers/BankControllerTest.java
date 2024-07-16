@@ -80,35 +80,37 @@ public class BankControllerTest {
         Mockito.when(bankService.getAllBanks(null)).thenReturn(banks);
     
         mockMvc.perform(MockMvcRequestBuilders
-                .get("/banks")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id", is(1)))
-                .andExpect(jsonPath("$[0].name", is("Alpha")))
-                .andExpect(jsonPath("$[0].bic", is("482321584")))
-                .andExpect(jsonPath("$[1].id", is(2)))
-                .andExpect(jsonPath("$[1].name", is("Otkritie")))
-                .andExpect(jsonPath("$[1].bic", is("217547203")));
+            .get("/banks")
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[0].id", is(1)))
+            .andExpect(jsonPath("$[0].name", is("Alpha")))
+            .andExpect(jsonPath("$[0].bic", is("482321584")))
+            .andExpect(jsonPath("$[1].id", is(2)))
+            .andExpect(jsonPath("$[1].name", is("Otkritie")))
+            .andExpect(jsonPath("$[1].bic", is("217547203")));
     }
 
     @Test
     void testUpdateBankById() throws Exception {
-        Bank updatedRecord = Bank.builder()
+        Bank updatedBank = Bank.builder()
             .id(1l)
             .name("Sberbank")
             .bic("428912324")
             .build();
 
-        Mockito.when(bankService.getBankById(1l)).thenReturn(updatedRecord);
+        Mockito.when(bankService.getBankById(1l)).thenReturn(updatedBank);
         Mockito.when(bankService.updateBank(1l, bankTest1)).thenReturn(new ResponseEntity<>(bankTest1, HttpStatus.OK));
 
         MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders.put("/banks/1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(this.mapper.writeValueAsString(bankTest1));
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .content(this.mapper.writeValueAsString(bankTest1));
 
         mockMvc.perform(mockRequest)
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name", is("Alpha")));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id", is(1)))
+            .andExpect(jsonPath("$.name", is("Alpha")))
+            .andExpect(jsonPath("$.bic", is("482321584")));
     }
 }

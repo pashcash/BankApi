@@ -60,4 +60,11 @@ public class DepositService {
             throw new BadRequestException("Sorting param is incorrect");
         return new ResponseEntity<>(depositRepository.findAll(Sort.by(sortColumn)), HttpStatus.OK);
     }
+
+    public Deposit getDepostById(Long depositId) {
+        Optional<Deposit> depositData = depositRepository.findById(depositId);
+        if (!depositData.isPresent())
+            throw new EntityNotFoundException("Deposit with id = " + depositId + " doesn`t exist");
+        return depositData.get();
+    }
 }
