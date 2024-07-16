@@ -14,13 +14,14 @@ import com.example.BankApi.exceptions.types.EntityNotFoundException;
 import com.example.BankApi.models.Deposit;
 import com.example.BankApi.repos.DepositRepository;
 
-import lombok.AllArgsConstructor;
-
 @Service
-@AllArgsConstructor
 public class DepositService {
 
     private DepositRepository depositRepository;
+
+    public DepositService(DepositRepository depositRepository) {
+        this.depositRepository = depositRepository;
+    }
 
     public ResponseEntity<Deposit> updateDeposit(Long depositId, Deposit depositDetails)
     {

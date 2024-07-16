@@ -16,14 +16,16 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.BankApi.models.Bank;
 import com.example.BankApi.services.BankService;
 
-import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/banks")
-@AllArgsConstructor
 public class BankController {
 
     private BankService bankService;
+
+    public BankController(BankService bankService) {
+        this.bankService = bankService;
+    }
 
     @PutMapping("/{id}")
     public ResponseEntity<Bank> updateBankById(@PathVariable Long id, @RequestBody Bank bankDetails)

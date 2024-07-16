@@ -16,14 +16,15 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.BankApi.models.Deposit;
 import com.example.BankApi.services.DepositService;
 
-import lombok.AllArgsConstructor;
-
 @RestController
 @RequestMapping("/deposits")
-@AllArgsConstructor
 public class DepositController {
     
     private DepositService depositService;
+
+    public DepositController(DepositService depositService) {
+        this.depositService = depositService;
+    }
 
     @PutMapping("/{id}")
     public ResponseEntity<Deposit> updateDepositById(@PathVariable Long id, @RequestBody Deposit depositDetails)

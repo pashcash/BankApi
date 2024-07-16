@@ -14,14 +14,15 @@ import com.example.BankApi.exceptions.types.EntityNotFoundException;
 import com.example.BankApi.models.Bank;
 import com.example.BankApi.repos.BankRepository;
 
-import lombok.AllArgsConstructor;
-
 @Service
-@AllArgsConstructor    
 public class BankService {
 
     private BankRepository bankRepository;
     
+    public BankService(BankRepository bankRepository) {
+        this.bankRepository = bankRepository;
+    }
+
     public ResponseEntity<Bank> updateBank(Long bankId, Bank bankDetails) {
         Optional<Bank> bankData = bankRepository.findById(bankId);
         if (!bankData.isPresent())
@@ -44,7 +45,8 @@ public class BankService {
         if (!bankData.isPresent())
             throw new EntityNotFoundException("Bank with id = " + bankId + " doesn`t exist");
         bankRepository.deleteById(bankId);
-        return new ResponseEntity<>(HttpStatus.OK);    }
+        return new ResponseEntity<>(HttpStatus.OK);    
+    }
 
     public ResponseEntity<List<Bank>> getAllBanks(String sortColumn)
     {

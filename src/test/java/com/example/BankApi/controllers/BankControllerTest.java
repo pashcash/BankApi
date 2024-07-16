@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import com.example.BankApi.exceptions.types.EntityNotFoundException;
 import com.example.BankApi.models.Bank;
 import com.example.BankApi.services.BankService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,7 +32,7 @@ public class BankControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    ObjectMapper mapper;
+    private ObjectMapper mapper;
 
     @MockBean
     private BankService bankService;
@@ -47,7 +48,7 @@ public class BankControllerTest {
     }
 
     @Test
-    void testAddNewBank() throws Exception {
+    void testAddNewBank_success() throws Exception {
         Mockito.when(bankService.addBank(bankTest1)).thenReturn(bankTest1);
 
         MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders.post("/banks")
@@ -64,8 +65,8 @@ public class BankControllerTest {
         }
 
     @Test
-    void testDeleteBankById() throws Exception {
-        Mockito.when(bankService.getBankById(1l)).thenReturn(bankTest1);
+    void testDeleteBankById_success() throws Exception {
+        Mockito.when(bankService.addBank(bankTest1)).thenReturn(bankTest1);
 
         mockMvc.perform(MockMvcRequestBuilders
             .delete("/banks/1")
@@ -74,7 +75,17 @@ public class BankControllerTest {
     }
 
     @Test
-    void testGetBanks() throws Exception {
+    void testDeleteBankById_notFound() throws Exception {
+        Mockito.when(bankService.addBank(bankTest2)).thenReturn(bankTest2);
+        Mockito.when(bankService.deleteBank(1l)).thenThrow(EntityNotFoundException.class);
+
+        mockMvc.perform(MockMvcRequestBuilders
+            .delete("/banks/1"))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void testGetBanks_success() throws Exception {
         ResponseEntity<List<Bank>> banks = new ResponseEntity<>(new ArrayList<>(Arrays.asList(bankTest1, bankTest2)), HttpStatus.OK);
     
         Mockito.when(bankService.getAllBanks(null)).thenReturn(banks);
@@ -92,12 +103,26 @@ public class BankControllerTest {
     }
 
     @Test
-    void testUpdateBankById() throws Exception {
-        Bank updatedBank = Bank.builder()
-            .id(1l)
-            .name("Sberbank")
-            .bic("428912324")
-            .build();
+    void testGetBanksSorted_success() throws Exception {
+        ResponseEntity<List<Bank>> banks = new ResponseEntity<>(new ArrayList<>(Arrays.asList(bankTest2, bankTest1)), HttpStatus.OK);
+    
+        Mockito.when(bankService.getAllBanks("bic")).thenReturn(banks);
+    
+        mockMvc.perform(MockMvcRequestBuilders
+            .get("/banks?sort-by=bic")
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[0].id", is(2)))
+            .andExpect(jsonPath("$[0].name", is("Otkritie")))
+            .andExpect(jsonPath("$[0].bic", is("217547203")))
+            .andExpect(jsonPath("$[1].id", is(1)))
+            .andExpect(jsonPath("$[1].name", is("Alpha")))
+            .andExpect(jsonPath("$[1].bic", is("482321584")));
+    }
+
+    @Test
+    void testUpdateBankById_success() throws Exception {
+        Bank updatedBank = new Bank(1l,"Sberbank","428912324");
 
         Mockito.when(bankService.getBankById(1l)).thenReturn(updatedBank);
         Mockito.when(bankService.updateBank(1l, bankTest1)).thenReturn(new ResponseEntity<>(bankTest1, HttpStatus.OK));
@@ -112,5 +137,17 @@ public class BankControllerTest {
             .andExpect(jsonPath("$.id", is(1)))
             .andExpect(jsonPath("$.name", is("Alpha")))
             .andExpect(jsonPath("$.bic", is("482321584")));
+    }
+
+    @Test
+    void testUpdateBankById_notFound() throws Exception {
+        Mockito.when(bankService.updateBank(2l, bankTest1)).thenThrow(EntityNotFoundException.class);
+        
+        mockMvc.perform(MockMvcRequestBuilders
+            .put("/banks/2")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .content(this.mapper.writeValueAsString(bankTest1)))
+            .andExpect(status().isNotFound());
     }
 }

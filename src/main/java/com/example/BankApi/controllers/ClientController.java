@@ -16,14 +16,15 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.BankApi.models.Client;
 import com.example.BankApi.services.ClientService;
 
-import lombok.AllArgsConstructor;
-
 @RestController
 @RequestMapping("/clients")
-@AllArgsConstructor
 public class ClientController {
     
     private ClientService clientService;
+
+    public ClientController(ClientService clientService) {
+        this.clientService = clientService;
+    }
 
     @PutMapping("/{id}")
     public ResponseEntity<Client> updateClientById(@PathVariable Long id, @RequestBody Client clientDetails)

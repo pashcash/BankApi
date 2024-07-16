@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.example.BankApi.enums.LegalForm;
+import com.example.BankApi.exceptions.types.EntityNotFoundException;
 import com.example.BankApi.models.Client;
 import com.example.BankApi.services.ClientService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -50,7 +51,7 @@ public class ClientControllerTest {
     }
 
     @Test
-    void testAddNewClient() throws Exception {
+    void testAddNewClient_success() throws Exception {
         Mockito.when(clientService.addClient(clientTest1)).thenReturn(clientTest1);
 
         MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders.post("/clients")
@@ -70,7 +71,7 @@ public class ClientControllerTest {
     
 
     @Test
-    void testDeleteClientById() throws Exception {
+    void testDeleteClientById_success() throws Exception {
         Mockito.when(clientService.getClientById(1l)).thenReturn(clientTest1);
 
         mockMvc.perform(MockMvcRequestBuilders
@@ -80,7 +81,16 @@ public class ClientControllerTest {
     }
 
     @Test
-    void testGetClients() throws Exception {
+    void testDeleteClientById_notFound() throws Exception {
+        Mockito.when(clientService.deleteClient(1l)).thenThrow(EntityNotFoundException.class);
+
+        mockMvc.perform(MockMvcRequestBuilders
+            .delete("/clients/1"))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void testGetClients_success() throws Exception {
         ResponseEntity<List<Client>> clients = new ResponseEntity<>(new ArrayList<>(Arrays.asList(clientTest1, clientTest2)), HttpStatus.OK);
     
         Mockito.when(clientService.getAllClients(null)).thenReturn(clients);
@@ -102,14 +112,30 @@ public class ClientControllerTest {
     }
 
     @Test
-    void testUpdateClientById() throws Exception {
-        Client updatedClient = Client.builder()
-            .id(1l)
-            .name("Gazprom")
-            .shortName("GProm")
-            .address("Perm, Petropavlovskaya 54")
-            .legalForm(LegalForm.OOO)
-            .build();
+    void testGetClientsSorted_success() throws Exception {
+        ResponseEntity<List<Client>> clients = new ResponseEntity<>(new ArrayList<>(Arrays.asList(clientTest2, clientTest1)), HttpStatus.OK);
+    
+        Mockito.when(clientService.getAllClients("name")).thenReturn(clients);
+    
+        mockMvc.perform(MockMvcRequestBuilders
+            .get("/clients?sort-by=name")
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[0].id", is(2)))
+            .andExpect(jsonPath("$[0].name", is("Auchan")))
+            .andExpect(jsonPath("$[0].shortName", is("Achn")))
+            .andExpect(jsonPath("$[0].address", is("Mytishchi, Ostashkovskoe 1")))
+            .andExpect(jsonPath("$[0].legalForm", is("OOO")))
+            .andExpect(jsonPath("$[1].id", is(1)))
+            .andExpect(jsonPath("$[1].name", is("Gazprom")))
+            .andExpect(jsonPath("$[1].shortName", is("GProm")))
+            .andExpect(jsonPath("$[1].address", is("Perm, Petropavlovskaya 54")))
+            .andExpect(jsonPath("$[1].legalForm", is("OOO")));
+    }
+
+    @Test
+    void testUpdateClientById_success() throws Exception {
+        Client updatedClient = new Client(1l,"Gazprom","GProm","Perm, Petropavlovskaya 54",LegalForm.OOO);
 
         Mockito.when(clientService.getClientById(1l)).thenReturn(updatedClient);
         Mockito.when(clientService.updateClient(1l, clientTest1)).thenReturn(new ResponseEntity<>(clientTest1, HttpStatus.OK));
@@ -126,5 +152,17 @@ public class ClientControllerTest {
             .andExpect(jsonPath("$.shortName", is("GProm")))
             .andExpect(jsonPath("$.address", is("Perm, Petropavlovskaya 54")))
             .andExpect(jsonPath("$.legalForm", is("OOO")));
+    }
+
+    @Test
+    void testUpdateClientById_notFound() throws Exception {
+        Mockito.when(clientService.updateClient(2l, clientTest1)).thenThrow(EntityNotFoundException.class);
+        
+        mockMvc.perform(MockMvcRequestBuilders
+            .put("/clients/2")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .content(this.mapper.writeValueAsString(clientTest1)))
+            .andExpect(status().isNotFound());
     }
 }

@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import com.example.BankApi.exceptions.types.EntityNotFoundException;
 import com.example.BankApi.models.Deposit;
 import com.example.BankApi.services.DepositService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -50,7 +51,7 @@ public class DepositControllerTest {
     }
 
     @Test
-    void testCreateNewDeposit() throws Exception {
+    void testCreateNewDeposit_success() throws Exception {
         Mockito.when(depositService.addDeposit(depositTest1)).thenReturn(depositTest1);
 
         MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders.post("/deposits")
@@ -70,7 +71,7 @@ public class DepositControllerTest {
     }
 
     @Test
-    void testDeleteDepositById() throws Exception {
+    void testDeleteDepositById_success() throws Exception {
         Mockito.when(depositService.getDepostById(1l)).thenReturn(depositTest1);
 
         mockMvc.perform(MockMvcRequestBuilders
@@ -80,7 +81,16 @@ public class DepositControllerTest {
     }
 
     @Test
-    void testGetDeposits() throws Exception {
+    void testDeleteDepositById_notFound() throws Exception {
+        Mockito.when(depositService.deleteDeposit(1l)).thenThrow(EntityNotFoundException.class);
+
+        mockMvc.perform(MockMvcRequestBuilders
+            .delete("/deposits/1"))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void testGetDeposits_success() throws Exception {
         ResponseEntity<List<Deposit>> deposits = new ResponseEntity<>(new ArrayList<>(Arrays.asList(depositTest1, depositTest2)), HttpStatus.OK);
     
         Mockito.when(depositService.getAllDeposits(null)).thenReturn(deposits);
@@ -104,15 +114,32 @@ public class DepositControllerTest {
     }
 
     @Test
-    void testUpdateDepositById() throws Exception {
-        Deposit updatedDeposit = Deposit.builder()
-            .id(1l)
-            .clientId(1l)
-            .bankId(2l)
-            .openDate(LocalDate.of(2023, 12, 1))
-            .percentage(10.5)
-            .term(12)
-            .build();
+    void testGetDepositsSorted_success() throws Exception {
+        ResponseEntity<List<Deposit>> deposits = new ResponseEntity<>(new ArrayList<>(Arrays.asList(depositTest2, depositTest1)), HttpStatus.OK);
+    
+        Mockito.when(depositService.getAllDeposits("percentage")).thenReturn(deposits);
+    
+        mockMvc.perform(MockMvcRequestBuilders
+            .get("/deposits?sort-by=percentage")
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[0].id", is(2)))
+            .andExpect(jsonPath("$[0].clientId", is(1)))
+            .andExpect(jsonPath("$[0].bankId", is(2)))
+            .andExpect(jsonPath("$[0].openDate", is("2023-12-07")))
+            .andExpect(jsonPath("$[0].percentage", is(10.5)))
+            .andExpect(jsonPath("$[0].term", is(12)))
+            .andExpect(jsonPath("$[1].id", is(1)))
+            .andExpect(jsonPath("$[1].clientId", is(1)))
+            .andExpect(jsonPath("$[1].bankId", is(1)))
+            .andExpect(jsonPath("$[1].openDate", is("2023-12-01")))
+            .andExpect(jsonPath("$[1].percentage", is(6.5)))
+            .andExpect(jsonPath("$[1].term", is(12)));
+    }
+
+    @Test
+    void testUpdateDepositById_success() throws Exception {
+        Deposit updatedDeposit = new Deposit(1l,1l,2l,LocalDate.of(2023, 12, 1),10.5,12);
 
         Mockito.when(depositService.getDepostById(1l)).thenReturn(updatedDeposit);
         Mockito.when(depositService.updateDeposit(1l, depositTest1)).thenReturn(new ResponseEntity<>(depositTest1, HttpStatus.OK));
@@ -131,5 +158,17 @@ public class DepositControllerTest {
             .andExpect(jsonPath("$.openDate", is("2023-12-01")))
             .andExpect(jsonPath("$.percentage", is(6.5)))
             .andExpect(jsonPath("$.term", is(12)));
+    }
+
+    @Test
+    void testUpdateDepositById_notFound() throws Exception {
+        Mockito.when(depositService.updateDeposit(2l, depositTest1)).thenThrow(EntityNotFoundException.class);
+        
+        mockMvc.perform(MockMvcRequestBuilders
+            .put("/deposits/2")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .content(this.mapper.writeValueAsString(depositTest1)))
+            .andExpect(status().isNotFound());
     }
 }

@@ -14,13 +14,14 @@ import com.example.BankApi.exceptions.types.EntityNotFoundException;
 import com.example.BankApi.models.Client;
 import com.example.BankApi.repos.ClientRepository;
 
-import lombok.AllArgsConstructor;
-
 @Service
-@AllArgsConstructor
 public class ClientService {
      
     private ClientRepository clientRepository;
+
+    public ClientService(ClientRepository clientRepository) {
+        this.clientRepository = clientRepository;
+    }
 
     public ResponseEntity<Client> updateClient(Long clientId, Client clientDetails) 
     {
